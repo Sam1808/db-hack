@@ -16,35 +16,38 @@ def get_schoolkid_account(kid_name):
 
 def fix_marks(kid_name):
     schoolkid = get_schoolkid_account(kid_name)
-    if schoolkid:
-        schoolkid_marks = Mark.objects.filter(schoolkid=schoolkid)
-        schoolkid_bad_marks = schoolkid_marks.filter(points__lte=3)
-        for mark in schoolkid_bad_marks:
-            mark.points = 5
-            mark.save()
+    if not schoolkid:
+        return None
+    schoolkid_bad_marks = Mark.objects.filter(schoolkid=schoolkid, points__lte=3)
+    for mark in schoolkid_bad_marks:
+        mark.points = 5
+        mark.save()
 
 def remove_chastisements(kid_name):
     schoolkid = get_schoolkid_account(kid_name)
-    if schoolkid:
-        schoolkid_chastisements = Chastisement.objects.filter(schoolkid=schoolkid)
-        for chastisement in schoolkid_chastisements:
-            chastisement.delete()
+    if not schoolkid:
+        return None
+    schoolkid_chastisements = Chastisement.objects.filter(schoolkid=schoolkid)
+    for chastisement in schoolkid_chastisements:
+        chastisement.delete()
 
 def create_commendation(kid_name, subject_of_lesson):
     schoolkid = get_schoolkid_account(kid_name)
-    if schoolkid:
-        schoolkid_lessons = Lesson.objects.filter(group_letter=schoolkid.group_letter).filter(year_of_study=schoolkid.year_of_study)
-        subject_schoolkid_lessons = schoolkid_lessons.filter(subject__title=subject_of_lesson).order_by('date').reverse()
-        last_lesson = subject_schoolkid_lessons[0]
-        wishes = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!', 'Ты меня приятно удивил!',
-                  'Великолепно!', 'Прекрасно!','Ты меня очень обрадовал!', 'Именно этого я давно ждал от тебя!',
-                  'Сказано здорово – просто и ясно!', 'Ты, как всегда, точен!', 'Очень хороший ответ!','Талантливо!',
-                  'Ты сегодня прыгнул выше головы!', 'Я поражен!', 'Уже существенно лучше!', 'Потрясающе!',
-                  'Замечательно!', 'Прекрасное начало!', 'Так держать!', 'Ты на верном пути!', 'Здорово!',
-                  'Это как раз то, что нужно!', 'Я тобой горжусь!', 'С каждым разом у тебя получается всё лучше!',
-                  'Мы с тобой не зря поработали!', 'Я вижу, как ты стараешься!', 'Ты растешь над собой!',
-                  'Ты многое сделал, я это вижу!', 'Теперь у тебя точно все получится!']
-        Commendation.objects.create(
+    if not schoolkid:
+        return None
+    schoolkid_lessons = Lesson.objects.filter(group_letter=schoolkid.group_letter, year_of_study=schoolkid.year_of_study)
+    subject_schoolkid_lessons = schoolkid_lessons.filter(subject__title=subject_of_lesson).order_by('date').reverse()
+    last_lesson = subject_schoolkid_lessons[0]
+    wishes = ['Молодец!', 'Отлично!', 'Хорошо!', 'Гораздо лучше, чем я ожидал!', 'Ты меня приятно удивил!',
+            'Великолепно!', 'Прекрасно!','Ты меня очень обрадовал!', 'Именно этого я давно ждал от тебя!',
+            'Сказано здорово – просто и ясно!', 'Ты, как всегда, точен!', 'Очень хороший ответ!','Талантливо!',
+            'Ты сегодня прыгнул выше головы!', 'Я поражен!', 'Уже существенно лучше!', 'Потрясающе!',
+            'Замечательно!', 'Прекрасное начало!', 'Так держать!', 'Ты на верном пути!', 'Здорово!',
+            'Это как раз то, что нужно!', 'Я тобой горжусь!', 'С каждым разом у тебя получается всё лучше!',
+            'Мы с тобой не зря поработали!', 'Я вижу, как ты стараешься!', 'Ты растешь над собой!',
+            'Ты многое сделал, я это вижу!', 'Теперь у тебя точно все получится!']
+    Commendation.objects.create(
             text=random.choice(wishes),created=last_lesson.date,schoolkid=schoolkid,subject=last_lesson.subject,teacher=last_lesson.teacher
         )
+
 print('Scripts READY ! ')
